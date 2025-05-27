@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+langchain-community
+langchain
+langchain-anthropic
+transformers
+torch
+python-dotenv
+chromadb
+pydantic
