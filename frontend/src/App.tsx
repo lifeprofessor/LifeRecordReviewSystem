@@ -10,13 +10,11 @@ import {
   Button,
   Text,
   useToast,
-  Container,
   Divider,
   Flex,
   useColorModeValue,
   Card,
   CardBody,
-  Spinner,
   Badge,
   theme,
   Icon,
@@ -46,16 +44,13 @@ function App() {
   const [evaluation, setEvaluation] = useState('');
   const [feedback, setFeedback] = useState('');
   const [suggestion, setSuggestion] = useState('');
-  const [example, setExample] = useState('');
   const [isDocumentsLoaded, setIsDocumentsLoaded] = useState(false);
   const [suggestionLength, setSuggestionLength] = useState(0);
   const [sessionId, setSessionId] = useState<string>('');
   const toast = useToast();
 
-  const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const cardBg = useColorModeValue('white', 'gray.800');
-  const headingColor = useColorModeValue('blue.600', 'blue.300');
 
 // 선택된 영역/학업 수준에 따라 문서 로드 API 호출
   const handleLoadDocuments = async () => {
@@ -153,7 +148,6 @@ function App() {
       setFeedback(data.feedback);
       setSuggestion(data.suggestion);
       setSuggestionLength(data.suggestion_length);
-      setExample(data.example);
     } catch (error: unknown) {
       toast({
         title: '오류',
@@ -166,6 +160,16 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  function parseFeedback(feedback: string) {
+    // "장점", "부족한 점", "개선 필요" 등으로 분리
+    const parts = feedback.split(/💡|⚠️|📝/).map(s => s.trim()).filter(Boolean);
+    const labels = feedback.match(/💡|⚠️|📝/g) || [];
+    return parts.map((content, idx) => ({
+      label: labels[idx],
+      content,
+    }));
+  }
 
   return (
     <ChakraProvider theme={customTheme}>
@@ -360,7 +364,7 @@ function App() {
                             2️⃣ 검토 의견
                           </Badge>
                         </Flex>
-                        <Text
+                        <Box
                           whiteSpace="pre-line"
                           lineHeight={1.9}
                           fontSize="lg"
@@ -368,8 +372,27 @@ function App() {
                           p={4}
                           borderRadius="md"
                         >
-                          {feedback}
-                        </Text>
+                          {parseFeedback(feedback).map((part, idx) => {
+                            // 👉로 시작하는 줄을 모두 분리
+                            const lines = part.content.split(/(👉[^\n]*)/).filter(line => line && line.trim() !== "");
+                            return (
+                              <Box key={idx} mb={2}>
+                                {/* 라벨(장점/부족한 점 등)만 한 줄로 출력 */}
+                                <Box as="div" fontWeight="bold" color={part.label === "💡" ? "yellow.600" : part.label === "⚠️" ? "orange.600" : "blue.600"} mb={1}>
+                                  {part.label} {part.label === "💡" && "장점"}{part.label === "⚠️" && "부족한 점"}{part.label === "📝" && "개선 필요"}
+                                </Box>
+                                {/* 👉로 시작하는 줄은 들여쓰기해서 출력 */}
+                                {lines.map((line, i) =>
+                                  line.startsWith("👉") ? (
+                                    <Box as="div" key={i} ml={8} mt={1}>
+                                      {line}
+                                    </Box>
+                                  ) : null
+                                )}
+                              </Box>
+                            );
+                          })}
+                        </Box>
                         <Divider my={6} />
                         <Flex align="center" mb={4}>
                           <Badge colorScheme="green" fontSize="md" px={3} py={1} borderRadius="full">

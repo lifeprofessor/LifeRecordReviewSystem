@@ -277,18 +277,18 @@ async def review_statement(request: ReviewRequest):
     
     try:
         template = """
-        당신은 고등학교 생기부 특기사항 작성 전문가입니다.
+당신은 고등학교 생기부 특기사항 작성 전문가입니다.
 
-        아래 입력된 문장을 기반으로 다음 세 가지 항목을 평가해 주세요:
+아래 입력된 문장을 기반으로 다음 세 가지 항목을 평가해 주세요:
 
-        ① 적합성 평가: 해당 문장이 작성요령에 적합한지 간단히 판단해 주세요.
-        ② 검토 의견: 문장의 장점, 부족한 점, 개선 포인트를 구체적으로 설명해 주세요.
-        ③ 개선 제안: 작성요령을 고려하여 문장을 더 나은 형태의 500자로 수정해 주세요
+① 적합성 평가: 해당 문장이 작성요령에 적합한지 간단히 판단해 주세요.
+② 검토 의견: 문장의 장점, 부족한 점, 개선 포인트를 구체적으로 설명해 주세요.
+③ 개선 제안: 작성요령을 고려하여 문장을 더 나은 형태의 500자로 수정해 주세요
 
-        입력 문장:
-        {question}
+입력 문장:
+{question}
 
-        ※ 응답은 반드시 위 순서와 번호(①②③)를 포함하여 간결하고 명확하게 출력해 주세요.
+※ 응답은 반드시 위 순서와 번호(①②③)를 포함하여 간결하고 명확하게 출력해 주세요.
         """
 
         chain = create_chain(vectorstore)
@@ -394,10 +394,10 @@ def prettify_bullet(text, emoji="•"):
 
 def prettify_feedback(text):
     # 장점/부족한 점을 이모지와 함께, 리스트는 들여쓰기
-    text = text.replace("장점:", "\n💡 장점")
-    text = text.replace("부족한 점:", "\n⚠️ 부족한 점")
-    text = text.replace("개선필요:", "\n📝 개선 필요")
-    text = text.replace("개선점:", "\n📝 개선점")
+    text = text.replace("장점:", "\n💡 ")
+    text = text.replace("부족한 점:", "\n⚠️ ")
+    text = text.replace("개선필요:", "\n📝 ")
+    text = text.replace("개선점:", "\n📝 ")
     text = prettify_bullet(text, emoji="👉")
     return text.strip()
 
