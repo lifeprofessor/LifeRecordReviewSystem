@@ -12,7 +12,15 @@
 - AI: Anthropic Claude, LangChain
 - Vector DB: ChromaDB
 
+## 필수 프로그램
+VS Code / Cursor AI (IDE)
+Git
+node.js
+
 ## 실행 방법
+
+### 0. github 복제
+git clone https://github.com/lifeprofessor/LifeRecordReviewSystem.git
 
 ### 1. 백엔드 실행
 ```bash
@@ -20,13 +28,13 @@
 cd backend
 
 # 가상환경 생성
-python -m venv venv
+#python -m venv venv
 
 # 가상환경 활성화
 # Windows의 경우:
-venv\Scripts\activate
+#venv\Scripts\activate
 # Linux/Mac의 경우:
-source venv/bin/activate
+#source venv/bin/activate
 
 # 가상환경이 활성화되면 프롬프트 앞에 (venv)가 표시됩니다
 # 이제 필요한 패키지들을 설치합니다
@@ -47,6 +55,9 @@ uvicorn main:app --host 0.0.0.0 --port 3000  # 포트 번호 변경
 
 ### 2. 프론트엔드 실행
 ```bash
+# 이제 필요한 패키지들을 설치합니다
+pip install -r requirements.txt
+
 # frontend 디렉토리로 이동
 cd frontend
 

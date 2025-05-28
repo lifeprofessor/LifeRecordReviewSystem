@@ -182,7 +182,9 @@ function App() {
           alignItems="flex-start"
           justifyContent="flex-start"
         >
-          <img src="/sdj-logo2.png" alt="학교 로고" style={{ width: 400, marginRight: 36 }} />
+          <a href="http://localhost:3000/">
+  <img src="/sdj-logo2.png" alt="학교 로고" style={{ width: 400, marginRight: 36 }} />
+</a>
           <br/><br/>
           <Heading size="md" color="blue.700" mb={8} fontWeight="bold" letterSpacing="tight">
             ☑️ 활동 영역 & 학업 수준 선택
