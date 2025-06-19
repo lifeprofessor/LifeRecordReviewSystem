@@ -170,3 +170,174 @@ npm start
 3. 해당 저장소를 통해 의미 유사한 기존 문장 3개 검색
 4. Claude에 맞춤 프롬프트와 함께 전달하여 평가 결과 + 추천 예시문장 생성
 5. 결과는 클라이언트 화면에 표시
+
+---
+
+
+# 🏫 내부망 React 프론트엔드 배포 가이드
+
+이 프로젝트는 학교/기관 내부망에서 React 기반 프론트엔드를 실행하고, FastAPI 백엔드와 연동하는 방법을 안내합니다. 외부 인터넷 없이도 브라우저에서 접근 가능하며, 백엔드와 안전하게 통신할 수 있도록 구성됩니다.
+
+---
+
+## 📁 프로젝트 구성 요약
+
+```
+project-root/
+├── frontend/        # React 앱
+├── backend/         # FastAPI 백엔드
+```
+
+---
+
+## 🛠️ 환경 요구사항
+
+- Node.js 및 npm 설치
+- Python + FastAPI (백엔드용)
+- 동일 네트워크 내 클라이언트 (교사망/학생망 등)
+
+---
+
+## 🚀 1. 프론트엔드 빌드 및 실행
+
+### 1.1 의존성 설치
+
+```bash
+cd frontend
+npm install
+```
+
+### 1.2 앱 빌드
+
+```bash
+npm run build
+```
+
+- `/frontend/build` 디렉토리가 생성됩니다.
+- 이 디렉토리 안에 HTML, JS, CSS 등 정적 파일이 저장됩니다.
+
+---
+
+## 🌐 2. 정적 서버로 앱 실행 (`serve` 사용)
+
+### 2.1 `serve` 설치
+
+```bash
+npm install -g serve
+```
+
+### 2.2 앱 실행
+
+```bash
+serve -s build -l 3000
+```
+
+- `-s`: SPA 모드 (React Router용)
+- `-l 3000`: 3000번 포트로 실행
+
+실행 후 아래와 같은 메시지를 확인할 수 있습니다:
+
+```
+Serving!
+- Local:            http://localhost:3000
+- On Your Network:  http://192.168.0.100:3000
+```
+
+---
+
+## 📲 3. 다른 기기에서 접속하기
+
+같은 네트워크에 있는 다른 PC, 태블릿, 스마트폰 등에서 다음과 같이 접속할 수 있습니다:
+
+```
+http://192.168.0.100:3000
+```
+
+- 위 IP 주소는 serve 실행 시 표시되는 실제 PC의 내부 IP로 변경해 주세요.
+- 브라우저는 `http://` 접속이어야 하며, HTTPS가 아닙니다.
+
+---
+
+## 🔁 4. 백엔드(FastAPI)와 연동 설정
+
+### 4.1 `.env` 파일에 API 주소 지정
+
+`frontend/.env` 파일 생성 후:
+
+```env
+REACT_APP_API_URL=http://192.168.0.100:8000
+```
+
+> 백엔드는 `uvicorn` 등으로 HTTP 포트 8000에서 실행되고 있어야 합니다.
+
+### 4.2 백엔드 실행 예시
+
+```bash
+cd backend
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+---
+
+## 🧪 5. 실행 확인
+
+- 브라우저에서 `http://<IP>:3000` 접속 → 앱이 잘 열리는지 확인
+- 콘솔에 fetch 관련 에러가 없으면 백엔드 API 연결도 정상
+- 백엔드 API도 브라우저에서 직접 접속 가능:  
+  `http://<IP>:8000/docs` (FastAPI 문서)
+
+---
+
+## ⚙️ 6. 자동 실행 스크립트 (선택)
+
+### 📁 Windows용 (`start_frontend.bat`)
+```bat
+@echo off
+cd /d %~dp0
+cd frontend
+npm run build
+serve -s build -l 3000
+```
+
+### 🐧 macOS/Linux용 (`start_frontend.sh`)
+```bash
+#!/bin/bash
+cd "$(dirname "$0")/frontend"
+npm run build
+serve -s build -l 3000
+```
+
+> 실행 후 브라우저에서 http://<IP>:3000 접속
+
+---
+
+## 🔐 참고: HTTPS는 꼭 필요한가요?
+
+- ❌ 내부망에서만 사용한다면 HTTPS는 **필수 아님**
+- ✅ 단, 프론트엔드를 Netlify 등에 배포한 경우는 HTTPS → 반드시 백엔드도 HTTPS 필요
+
+---
+
+## 📚 관련 도구
+
+| 도구       | 설명                                     |
+|------------|------------------------------------------|
+| React      | 프론트엔드 SPA (Single Page Application) |
+| FastAPI    | Python 기반 백엔드 프레임워크            |
+| serve      | 정적 웹서버. React 빌드 결과를 배포함     |
+| uvicorn    | FastAPI 실행용 ASGI 서버                 |
+
+---
+
+## 📌 요약
+
+| 항목            | 명령어 또는 경로                       |
+|-----------------|----------------------------------------|
+| 앱 빌드         | `npm run build`                        |
+| 앱 실행         | `serve -s build -l 3000`               |
+| 백엔드 실행     | `uvicorn main:app --host 0.0.0.0 --port 8000` |
+| 내부망 접속 주소 | `http://<내부 IP>:3000`               |
+
+---
+
+내부망 환경에 맞게 설정 파일을 조정하고, 보안이 중요한 경우 인증 등 추가 기능을 구성하세요. 필요 시 자동화 및 배포 스크립트를 함께 제공합니다.
