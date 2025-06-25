@@ -1,0 +1,61 @@
+### Input
+
+fastapi + react + LangChain + Claude API를 활용하여 고등학교 생기부 특기사항 작성 문장을 검토하고, 기재요령에 부합하는지 확인 및 개선 피드백을 제공하는 시스템을 구현합니다.
+
+데이터는 다음과 같이 구성되어 있습니다:
+- 각 활동 영역별로 작성요령 마크다운 파일들을 정리 (예: `backend/data/self_governance_guidelines/`)
+- 사용자가 입력한 문장과 가장 유사한 작성요령을 벡터 검색으로 찾은 후, Claude API에 context로 함께 전달합니다.
+- Claude는 해당 문장이 작성요령에 맞는지 평가하고 개선안을 제시합니다.
+
+### 분석
+
+- 주요 목적: 생기부 특기사항 문장에 대해 작성요령 기반 자동 평가 및 개선안 제시 시스템 구현
+- 세부 요구사항:
+  - 영역별 폴더에서 마크다운 문서를 불러와 벡터화
+  - 유사 문서 검색 (RAG)
+  - Claude API에 context 포함한 프롬프트 전달
+  - 웹웹 UI로 사용자 입력과 결과 출력
+
+### 최적화된 프롬프트
+
+- 작업 지침:
+  1. react로 웹웹을 구축하세요.
+  2. 사용자가 선택한 활동 영역에 따라 해당 폴더의 `.md` 파일을 로드하고 벡터화하세요.
+  3. 입력된 생기부 특기사항 문장을 기반으로 유사한 작성요령을 검색하세요.
+  4. Claude API에 context와 문장을 전달해 피드백을 생성하세요.
+  5. Claude의 응답을 다음 포맷으로 출력하세요:  
+     ① 적합성 평가 / ② 검토 의견 / ③ 개선 제안
+
+- 기대 결과:
+  - 사용자의 입력 문장에 대해 작성요령 준수 여부와 개선 방향 제시
+  - 영역별로 분리된 작성요령 데이터를 활용한 정확한 RAG 검색
+  - 웹 인터페이스에서 손쉬운 입력과 결과 확인 가능
+
+### 데이터 구조
+  ├─backend/data
+  ├─self_governance_guidelines
+  │      01_self_governance_importance.md
+  │      02_school_record_writing_importance.md
+  │      03_self_governance_input_review_guide.md
+  │      04_self_governance_evaluation_revision.md
+  │      05_self_governance_structure_criteria.md
+  │      06_self_governance_effective_writing.md
+  │      07_leadership_record_evaluation_guide.md
+  │      08_self_governance_checklist.md
+  │      09_self_governance_7_steps.md
+  │      10_self_governance_planning_guide.md
+  │
+  └─career_activity_guidelines
+          01_career_activity_detail_guide.md
+          02_career_activity_key_factors.md
+          03_school_record_core_principles.md
+          04_career_activity_writing_rules.md
+          05_names_institution_teacher_guide.md
+          06_career_activity_structure.md
+          07_career_inquiry_writing_guide.md
+          08_career_exploration_guide.md
+          09_career_counseling_selfunderstanding.md
+          10_career_planning_writing_guide.md
+          11_academic_level_community_skills.md
+          12_career_activity_hierarchy_evaluation.md
+          13_career_activity_examples_comparison.md
