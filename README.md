@@ -52,6 +52,17 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 # 3. 다른 포트 사용이 필요한 경우
 uvicorn main:app --host 0.0.0.0 --port 3000  # 포트 번호 변경
+
+# 4. ONNX Runtime + CUDA 방식으로 전환
+## PyTorch 완전 제거
+pip uninstall torch torchvision torchaudio -y
+
+## ONNX Runtime + CUDA 설치
+pip install onnxruntime-gpu
+pip install transformers[onnx]
+pip install optimum[onnxruntime]
+pip install numpy
+
 ```
 
 ### 2. 프론트엔드 실행

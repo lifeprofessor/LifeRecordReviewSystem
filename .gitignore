@@ -42,6 +42,7 @@ yarn-error.log*
 backend/chroma_db/
 backend/model_cache/
 backend/model_files/
+backend/onnx_models/
 *.log
 
 # Environment files
