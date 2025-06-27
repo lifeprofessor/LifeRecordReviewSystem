@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { FiFileText, FiEdit, FiBookOpen, FiCheckCircle } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = `http://${window.location.hostname}:8000`;
 
 // Custom theme extension
 const customTheme = {
