@@ -1,21 +1,42 @@
+# LifeRecordReview System - Python 의존성
+# 생기부 특기사항 문장 평가 시스템
+
+# === 필수 패키지 ===
+
+# 웹 프레임워크
+fastapi==0.115.9
+uvicorn==0.32.1
+pydantic==2.11.4
+
+# LangChain 생태계 (AI 체인 오케스트레이션)
 langchain==0.3.25
 langchain-community==0.3.24
 langchain-anthropic==0.3.13
-langchain-huggingface==0.2.0
-langchain-core>=0.3.58
-python-dotenv==1.1.0
-chromadb==1.0.9
-sentence-transformers==4.1.0
-torch==2.7.0
+langchain-core==0.3.25
+
+# AI/ML 모델 및 처리
 transformers==4.51.3
+torch==2.7.0
 numpy==1.26.4
-huggingface-hub==0.31.2
-anthropic==0.51.0
-pydantic==2.11.4
-fastapi==0.115.9
-uvicorn==0.32.1
+
+# 벡터 데이터베이스
+chromadb==1.0.9
+
+# HTTP 클라이언트 및 네트워킹
 httpx==0.28.1
-pandas==2.1.3
-Pillow==9.5.0
-tqdm==4.66.1
-typing_extensions==4.13.2
+requests==2.31.0
+urllib3==2.0.7
+
+# 환경 설정
+python-dotenv==1.1.0
+
+# === GPU 가속 패키지 (선택사항) ===
+# 성능 향상을 위해 설치 권장
+# pip install onnxruntime-gpu>=1.15.0
+# pip install optimum[onnxruntime]>=1.14.0  
+# pip install pynvml>=11.5.0
+
+# === 설치 가이드 ===
+# 1. 기본 설치: pip install -r requirements.txt
+# 2. GPU 가속: pip install onnxruntime-gpu optimum[onnxruntime] pynvml
+# 3. CPU 전용: pip install onnxruntime optimum

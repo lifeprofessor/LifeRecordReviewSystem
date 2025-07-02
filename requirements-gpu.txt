@@ -1,0 +1,28 @@
+# LifeRecordReview System - GPU 가속 패키지
+# 성능 향상을 위한 선택적 설치 패키지
+
+# 기본 패키지 먼저 설치 필요:
+# pip install -r requirements.txt
+
+# === GPU 가속 패키지 ===
+
+# ONNX Runtime (GPU 가속)
+onnxruntime-gpu>=1.15.0
+
+# 모델 최적화 및 변환
+optimum[onnxruntime]>=1.14.0
+
+# GPU 모니터링 (NVIDIA)
+pynvml>=11.5.0
+
+# === 설치 방법 ===
+# GPU 가속 설치: pip install -r requirements-gpu.txt
+# 또는 개별 설치: pip install onnxruntime-gpu optimum[onnxruntime] pynvml
+
+# === CPU 전용 설치 ===
+# GPU가 없는 경우: pip install onnxruntime optimum
+
+# === 시스템 요구사항 ===
+# - NVIDIA GPU (RTX 시리즈 권장)
+# - CUDA Toolkit 11.8 이상
+# - GPU 메모리 4GB 이상 권장 

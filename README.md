@@ -107,15 +107,24 @@ source venv/bin/activate
 
 #### 2.2 의존성 패키지 설치
 ```bash
-# 기본 패키지 설치
+# 기본 패키지 설치 (필수)
 pip install -r requirements.txt
 
-# 추가 최적화 패키지 (GPU 가속용)
-pip install onnxruntime-gpu transformers[onnx] optimum[onnxruntime] pynvml
+# GPU 가속 패키지 설치 (성능 향상용)
+pip install -r requirements-gpu.txt
 
-# CPU만 사용하는 경우
-pip install onnxruntime transformers optimum
+# 개발 환경 패키지 설치 (개발자용)
+pip install -r requirements-dev.txt
+
+# 또는 백엔드만 설치하는 경우
+pip install -r backend/requirements.txt
 ```
+
+**패키지 파일 설명:**
+- `requirements.txt`: 기본 필수 패키지 (프로덕션용)
+- `requirements-gpu.txt`: GPU 가속 패키지 (성능 향상용)
+- `requirements-dev.txt`: 개발 도구 패키지 (개발자용)
+- `backend/requirements.txt`: 백엔드 전용 패키지
 
 #### 2.3 환경변수 설정
 ```bash
@@ -341,10 +350,14 @@ pip install -r requirements.txt --no-cache-dir
 ```bash
 # GPU 버전 설치 실패 시 CPU 버전 사용
 pip uninstall onnxruntime-gpu
-pip install onnxruntime
+pip install onnxruntime optimum
 
 # 또는 특정 버전 지정
-pip install onnxruntime-gpu==1.15.1
+pip install onnxruntime-gpu==1.15.1 optimum[onnxruntime]==1.14.0
+
+# 전체 GPU 패키지 재설치
+pip uninstall -r requirements-gpu.txt
+pip install onnxruntime optimum  # CPU 버전
 ```
 
 ### 2. 모델 로딩 문제
@@ -505,7 +518,7 @@ print(f"GPU Memory: {info.used/1024**3:.1f}GB / {info.total/1024**3:.1f}GB")
 LifeRecordReviewSystem/
 ├── backend/                    # FastAPI 백엔드
 │   ├── main.py                # 메인 서버 파일
-│   ├── requirements.txt       # Python 의존성
+│   ├── requirements.txt       # 백엔드 전용 의존성
 │   ├── data/                  # 가이드라인 데이터
 │   │   ├── career_activity_guidelines/     # 진로활동 (13개 파일)
 │   │   └── self_governance_guidelines/     # 자율/자치활동 (10개 파일)
@@ -519,7 +532,10 @@ LifeRecordReviewSystem/
 │   │   └── index.tsx         # 진입점
 │   ├── package.json          # Node.js 의존성
 │   └── public/               # 정적 파일
-└── requirements.txt          # 전체 Python 의존성
+├── requirements.txt          # 기본 Python 의존성 (필수)
+├── requirements-gpu.txt      # GPU 가속 패키지 (선택)
+├── requirements-dev.txt      # 개발 도구 패키지 (개발자용)
+└── README.md                # 프로젝트 문서
 ```
 
 ### 주요 데이터 파일

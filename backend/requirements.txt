@@ -1,11 +1,32 @@
+# 웹 프레임워크
 fastapi==0.115.9
-uvicorn
+uvicorn==0.32.1
+pydantic==2.11.4
+
+# LangChain 생태계
 langchain==0.3.25
 langchain-community==0.3.24
 langchain-anthropic==0.3.13
 langchain-core==0.3.25
+
+# AI/ML 모델
 transformers==4.51.3
 torch==2.7.0
-python-dotenv==1.1.0
+numpy==1.26.4
+
+# 벡터 데이터베이스
 chromadb==1.0.9
-pydantic==2.11.4
+
+# HTTP 클라이언트
+httpx==0.28.1
+requests==2.31.0
+urllib3==2.0.7
+
+# 환경 설정
+python-dotenv==1.1.0
+
+# GPU 가속 (선택사항)
+# 아래 패키지들은 필요시 별도 설치
+# onnxruntime-gpu>=1.15.0
+# optimum[onnxruntime]>=1.14.0
+# pynvml>=11.5.0

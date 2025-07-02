@@ -1,0 +1,38 @@
+# LifeRecordReview System - 개발 환경 패키지
+# 개발, 테스팅, 디버깅을 위한 선택적 패키지
+
+# 기본 패키지 먼저 설치 필요:
+# pip install -r requirements.txt
+
+# === 개발 도구 ===
+
+# 코드 포맷팅 및 린팅
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+
+# 타입 체킹
+mypy>=1.5.0
+
+# 테스팅
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.24.0  # 테스트용 HTTP 클라이언트
+
+# 개발 서버 (hot reload)
+watchfiles>=0.19.0
+
+# 디버깅 및 프로파일링
+ipython>=8.14.0
+memory-profiler>=0.61.0
+
+# === 설치 방법 ===
+# 개발 환경 설치: pip install -r requirements-dev.txt
+# 
+# === 사용법 ===
+# 코드 포맷팅: black backend/
+# import 정렬: isort backend/
+# 린팅: flake8 backend/
+# 타입 체킹: mypy backend/main.py
+# 테스트 실행: pytest
+# 개발 서버: uvicorn main:app --reload 
