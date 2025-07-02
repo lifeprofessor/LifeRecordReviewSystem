@@ -26,6 +26,8 @@ from asyncio import Semaphore
 import threading
 import time
 import numpy as np
+import atexit
+import signal
 
 # ONNX Runtime 관련 import (안전한 방식)
 try:
@@ -540,11 +542,59 @@ def cleanup_expired_sessions():
         session_id for session_id, session_data in sessions.items()
         if current_time - session_data['created_at'] > SESSION_TIMEOUT
     ]
+    
     for session_id in expired_sessions:
-        if os.path.exists(os.path.join(CHROMA_DB_DIR, session_id)):
-            import shutil
-            shutil.rmtree(os.path.join(CHROMA_DB_DIR, session_id))
-        del sessions[session_id]
+        try:
+            # 1. vectorstore 객체 먼저 정리
+            if session_id in sessions and 'vectorstore' in sessions[session_id]:
+                vectorstore = sessions[session_id]['vectorstore']
+                if hasattr(vectorstore, '_client') and vectorstore._client:
+                    try:
+                        vectorstore._client.reset()
+                    except:
+                        pass
+                del vectorstore
+            
+            # 2. 세션에서 제거
+            if session_id in sessions:
+                del sessions[session_id]
+            
+            # 3. 파일 시스템에서 삭제 (재시도 메커니즘 포함)
+            session_dir = os.path.join(CHROMA_DB_DIR, session_id)
+            if os.path.exists(session_dir):
+                import shutil
+                import time
+                
+                # Windows에서의 파일 삭제 재시도
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        # 가비지 컬렉션 강제 실행
+                        import gc
+                        gc.collect()
+                        
+                        # 잠시 대기 후 삭제 시도
+                        if attempt > 0:
+                            time.sleep(0.5)
+                        
+                        shutil.rmtree(session_dir)
+                        print(f"✅ 만료된 세션 디렉토리 삭제 완료: {session_id}")
+                        break
+                        
+                    except PermissionError as e:
+                        if attempt == max_retries - 1:
+                            print(f"⚠️ 세션 디렉토리 삭제 실패 (권한 문제): {session_id} - {str(e)}")
+                            # 삭제 실패 시에도 세션은 메모리에서 제거했으므로 계속 진행
+                        else:
+                            print(f"🔄 세션 디렉토리 삭제 재시도 중... ({attempt + 1}/{max_retries}): {session_id}")
+                    except Exception as e:
+                        print(f"❌ 세션 디렉토리 삭제 중 예외 발생: {session_id} - {str(e)}")
+                        break
+                        
+        except Exception as e:
+            print(f"❌ 세션 정리 중 예외 발생: {session_id} - {str(e)}")
+            # 개별 세션 정리 실패 시에도 다른 세션들은 계속 처리
+            continue
 
 @app.post("/api/load-documents")
 async def load_documents(request: LoadDocumentRequest):
@@ -782,21 +832,47 @@ async def list_sessions():
 
 @app.delete("/api/sessions/{session_id}")
 async def delete_session(session_id: str):
-    """특정 세션을 삭제합니다."""
     if session_id not in sessions:
         raise HTTPException(status_code=404, detail="Session not found")
     
     try:
-        # Chroma DB 디렉토리 삭제
-        session_db_dir = os.path.join(CHROMA_DB_DIR, session_id)
-        if os.path.exists(session_db_dir):
-            import shutil
-            shutil.rmtree(session_db_dir)
+        # vectorstore 객체 먼저 정리
+        if 'vectorstore' in sessions[session_id]:
+            vectorstore = sessions[session_id]['vectorstore']
+            if hasattr(vectorstore, '_client') and vectorstore._client:
+                try:
+                    vectorstore._client.reset()
+                except:
+                    pass
+            del vectorstore
         
-        # 세션 정보 삭제
+        # 메모리에서 세션 제거
         del sessions[session_id]
         
-        return {"status": "success", "message": "Session deleted successfully"}
+        # 파일 시스템에서 삭제 (비동기적으로 처리)
+        session_dir = os.path.join(CHROMA_DB_DIR, session_id)
+        if os.path.exists(session_dir):
+            import asyncio
+            import shutil
+            
+            async def cleanup_directory():
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        await asyncio.sleep(0.1)  # 짧은 대기
+                        shutil.rmtree(session_dir)
+                        break
+                    except PermissionError:
+                        if attempt < max_retries - 1:
+                            await asyncio.sleep(0.5)
+                        else:
+                            print(f"⚠️ 세션 디렉토리 삭제 지연됨: {session_id}")
+            
+            # 백그라운드에서 삭제 작업 수행
+            asyncio.create_task(cleanup_directory())
+        
+        return {"status": "success", "message": "Session deleted"}
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting session: {str(e)}")
 
@@ -924,6 +1000,22 @@ def create_chain(vectorstore):
         traceback.print_exc()
         print("==========================")
         raise HTTPException(status_code=500, detail=f"Chain 생성 중 오류 발생: {str(e)}")
+
+def cleanup_all_sessions():
+    """서버 종료 시 모든 세션 정리"""
+    print("🧹 서버 종료 중 - 모든 세션 정리...")
+    for session_id in list(sessions.keys()):
+        try:
+            if 'vectorstore' in sessions[session_id]:
+                vectorstore = sessions[session_id]['vectorstore']
+                if hasattr(vectorstore, '_client') and vectorstore._client:
+                    vectorstore._client.reset()
+        except:
+            pass
+    sessions.clear()
+
+# 서버 종료 시 정리 함수 등록
+atexit.register(cleanup_all_sessions)
 
 if __name__ == "__main__":
     import uvicorn
