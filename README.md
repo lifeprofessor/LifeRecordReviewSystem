@@ -179,13 +179,6 @@ model = AutoModel.from_pretrained('./backend/model_files', local_files_only=True
 print('✅ 모델 로드 성공!')
 "
 ```
-backend/model_files/
-├── config.json
-├── pytorch_model.bin
-├── tokenizer.json
-├── tokenizer_config.json
-├── vocab.txt
-└── special_tokens_map.json
 
 ##### ✅ 설치 확인
 ```bash
@@ -196,8 +189,6 @@ model = AutoModel.from_pretrained('./backend/model_files', local_files_only=True
 print('✅ 모델 로드 성공!')
 "
 ```
-```
-
 
 #### 2.5 로컬 모델 동작 과정
 시스템이 처음 실행될 때 자동으로 한국어 임베딩 모델을 다운로드하고 ONNX로 변환합니다. 
