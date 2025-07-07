@@ -133,9 +133,45 @@ echo "ANTHROPIC_API_KEY=your_anthropic_api_key_here" > .env
 ```
 
 #### 2.4 로컬 모델 준비
-시스템이 처음 실행될 때 자동으로 한국어 임베딩 모델을 다운로드하고 ONNX로 변환합니다. 이 과정은 최초 1회만 진행됩니다.
+1. 모델 폴더 생성
+mkdir backend/model_files
 
-#### 2.5 백엔드 서버 실행
+2. 모델 페이지 접속
+- BM-K/KoSimCSE-roberta-multitask 접속
+
+3. 파일 다운로드
+- 페이지에서 "Files" 탭 클릭
+- 다음 파일들을 backend/model_files/ 폴더에 다운로드:
+    - config.json
+    - pytorch_model.bin
+    - tokenizer.json
+    - tokenizer_config.json
+    - vocab.txt
+    - special_tokens_map.json
+
+4. 폴더 구조 확인
+backend/model_files/
+├── config.json
+├── pytorch_model.bin
+├── tokenizer.json
+├── tokenizer_config.json
+├── vocab.txt
+└── special_tokens_map.json
+
+5. 다운로드 확인
+[모델 로드 테스트]
+python -c "
+from transformers import AutoTokenizer, AutoModel
+tokenizer = AutoTokenizer.from_pretrained('./backend/model_files', local_files_only=True)
+model = AutoModel.from_pretrained('./backend/model_files', local_files_only=True)
+print('✅ 모델 로드 성공!')
+"
+
+#### 2.5 로컬 모델 동작 과정
+시스템이 처음 실행될 때 자동으로 한국어 임베딩 모델을 다운로드하고 ONNX로 변환합니다. 
+이 과정은 최초 1회만 진행됩니다.
+
+#### 2.6 백엔드 서버 실행
 ```bash
 # 로컬 개발용
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
@@ -186,6 +222,39 @@ ANTHROPIC_VERIFY_SSL=false
 3. `.env` 파일에 키 입력
 
 ### GPU 가속 설정
+
+#### cuDNN 설치 (GPU 가속 필수)
+
+cuDNN은 딥러닝 연산을 GPU에서 가속하는 핵심 라이브러리입니다.
+
+**1. NVIDIA 개발자 계정 생성**
+- [NVIDIA Developer](https://developer.nvidia.com/) 접속 후 무료 가입
+
+**2. cuDNN 다운로드**
+- [cuDNN 다운로드 페이지](https://developer.nvidia.com/cudnn) 접속
+- **CUDA 12.x용 cuDNN 9.x** 선택 및 다운로드
+
+**3. 설치 (Windows)**
+```bash
+# 다운로드한 압축 파일 압축 해제 후 다음 파일들을 복사:
+# bin 폴더의 모든 DLL → C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.x\bin
+# include 폴더의 모든 파일 → C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.x\include  
+# lib 폴더의 모든 파일 → C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.x\lib\x64
+```
+
+**4. 환경변수 설정**
+- 시스템 환경변수 Path에 추가: `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.x\bin`
+
+**5. 설치 확인**
+```bash
+# cuDNN 설치 확인
+python -c "import ctypes; ctypes.CDLL('cudnn64_9.dll')"
+
+# ONNX Runtime GPU 확인
+python -c "import onnxruntime as ort; print('Available providers:', ort.get_available_providers())"
+# 출력에 'CUDAExecutionProvider'가 있어야 함
+```
+
 ```bash
 # NVIDIA GPU 드라이버 확인
 nvidia-smi

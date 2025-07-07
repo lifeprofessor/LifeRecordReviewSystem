@@ -7,7 +7,7 @@ pydantic==2.11.4
 langchain==0.3.25
 langchain-community==0.3.24
 langchain-anthropic==0.3.13
-langchain-core==0.3.25
+langchain-core>=0.3.58
 
 # AI/ML 모델
 transformers==4.51.3
