@@ -133,23 +133,52 @@ echo "ANTHROPIC_API_KEY=your_anthropic_api_key_here" > .env
 ```
 
 #### 2.4 로컬 모델 준비
-1. 모델 폴더 생성
+
+시스템에서 사용할 한국어 임베딩 모델을 준비합니다.
+
+##### 📁 모델 폴더 생성
+```bash
 mkdir backend/model_files
+```
 
-2. 모델 페이지 접속
-- BM-K/KoSimCSE-roberta-multitask 접속
+##### 🔗 모델 다운로드
+1. **Hugging Face 모델 페이지 접속**
+   - [BM-K/KoSimCSE-roberta-multitask](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask) 접속
 
-3. 파일 다운로드
-- 페이지에서 "Files" 탭 클릭
-- 다음 파일들을 backend/model_files/ 폴더에 다운로드:
-    - config.json
-    - pytorch_model.bin
-    - tokenizer.json
-    - tokenizer_config.json
-    - vocab.txt
-    - special_tokens_map.json
+2. **파일 다운로드**
+   - 페이지에서 **"Files"** 탭 클릭
+   - 다음 파일들을 `backend/model_files/` 폴더에 다운로드:
 
-4. 폴더 구조 확인
+| 파일명 | 설명 |
+|--------|------|
+| `config.json` | 모델 설정 파일 |
+| `pytorch_model.bin` | 모델 가중치 파일 |
+| `tokenizer.json` | 토크나이저 설정 |
+| `tokenizer_config.json` | 토크나이저 구성 |
+| `vocab.txt` | 어휘 사전 |
+| `special_tokens_map.json` | 특수 토큰 매핑 |
+
+##### 📂 폴더 구조 확인
+```bash
+backend/model_files/
+├── config.json
+├── pytorch_model.bin
+├── tokenizer.json
+├── tokenizer_config.json
+├── vocab.txt
+└── special_tokens_map.json
+```
+
+##### 다운로드 확인
+```bash
+[모델 로드 테스트]
+python -c "
+from transformers import AutoTokenizer, AutoModel
+tokenizer = AutoTokenizer.from_pretrained('./backend/model_files', local_files_only=True)
+model = AutoModel.from_pretrained('./backend/model_files', local_files_only=True)
+print('✅ 모델 로드 성공!')
+"
+```
 backend/model_files/
 ├── config.json
 ├── pytorch_model.bin
@@ -158,14 +187,17 @@ backend/model_files/
 ├── vocab.txt
 └── special_tokens_map.json
 
-5. 다운로드 확인
-[모델 로드 테스트]
+##### ✅ 설치 확인
+```bash
 python -c "
 from transformers import AutoTokenizer, AutoModel
 tokenizer = AutoTokenizer.from_pretrained('./backend/model_files', local_files_only=True)
 model = AutoModel.from_pretrained('./backend/model_files', local_files_only=True)
 print('✅ 모델 로드 성공!')
 "
+```
+```
+
 
 #### 2.5 로컬 모델 동작 과정
 시스템이 처음 실행될 때 자동으로 한국어 임베딩 모델을 다운로드하고 ONNX로 변환합니다. 
